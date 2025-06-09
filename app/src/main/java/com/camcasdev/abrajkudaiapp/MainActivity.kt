@@ -5,9 +5,12 @@ import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -16,6 +19,7 @@ import androidx.lifecycle.lifecycleScope
 import com.camcasdev.abrajkudaiapp.models.User
 import com.camcasdev.abrajkudaiapp.network.RetrofitClient
 import com.camcasdev.abrajkudaiapp.ui.theme.AbrajkudaiappTheme
+import com.camcasdev.abrajkudaiapp.ui.screens.MainScreen
 
 import com.camcasdev.abrajkudaiapp.network.TokenStorage
 import kotlinx.coroutines.launch
@@ -38,8 +42,8 @@ class MainActivity : ComponentActivity() {
 
         val serviceInstane = RetrofitClient.apiService //Iniciamos la instancia para petición
 
-        lifecycleScope.launch{
-            try{
+        lifecycleScope.launch {
+            try {
                 Log.d("Corutina", "Iniciando las peticiones")
                 val responseData: List<User> = serviceInstane.getUserList()
 
@@ -52,29 +56,13 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             AbrajkudaiappTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Vamos a ver que pasa",
-                        modifier = Modifier.padding(innerPadding)
-                    )
+                Surface(
+                    modifier = Modifier.fillMaxSize(),
+                    color = MaterialTheme.colorScheme.background
+                ) {
+                    MainScreen()
                 }
             }
         }
-    }
-}
-
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    AbrajkudaiappTheme {
-        Greeting("Android")
     }
 }
