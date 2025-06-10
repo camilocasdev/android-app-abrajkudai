@@ -5,6 +5,7 @@ import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.viewModels
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -22,9 +23,13 @@ import com.camcasdev.abrajkudaiapp.ui.theme.AbrajkudaiappTheme
 import com.camcasdev.abrajkudaiapp.ui.screens.MainScreen
 
 import com.camcasdev.abrajkudaiapp.network.TokenStorage
+import com.camcasdev.abrajkudaiapp.viewmodels.UserViewModel
 import kotlinx.coroutines.launch
+import retrofit2.Response
 
 class MainActivity : ComponentActivity() {
+
+    val viewModel by viewModels<UserViewModel>()
 
     companion object {
         private var isTokenStorageInitialized = false
@@ -45,7 +50,7 @@ class MainActivity : ComponentActivity() {
         lifecycleScope.launch {
             try {
                 Log.d("Corutina", "Iniciando las peticiones")
-                val responseData: List<User> = serviceInstane.getUserList()
+                val responseData: Response<List<User>> = serviceInstane.getUserList()
 
                 Log.d("Lista de Usuarios", "Respuesta de API: $responseData")
 
@@ -60,7 +65,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    MainScreen()
+                    MainScreen(viewModel)
                 }
             }
         }

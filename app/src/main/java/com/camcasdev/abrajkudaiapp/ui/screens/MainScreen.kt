@@ -1,142 +1,139 @@
 package com.camcasdev.abrajkudaiapp.ui.screens
 
-import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Divider
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.camcasdev.abrajkudaiapp.components.Formulario
 import com.camcasdev.abrajkudaiapp.models.User
-import com.camcasdev.abrajkudaiapp.network.RetrofitClient
+import com.camcasdev.abrajkudaiapp.viewmodels.UserViewModel
+import com.camcasdev.abrajkudaiapp.components.CardUser
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainScreen() {
-    var usuarios by remember { mutableStateOf<List<User>>(emptyList()) }
-    var isLoading by remember { mutableStateOf(true) }
-    var errorMessage by remember { mutableStateOf<String?>(null) }
+fun MainScreen(viewModel: UserViewModel) {
 
-    LaunchedEffect(Unit) {
-        isLoading = true
-        errorMessage = null
-        try {
-            usuarios = RetrofitClient.apiService.getUserList()
+    Box(
+        modifier = Modifier.fillMaxSize()
+    ) {
+        viewModel.getUserList()
+        ScreenCRUD(viewModel._userList, viewModel)
+    }
+}
 
-        } catch (e: Exception) {
-            e.printStackTrace()
-            errorMessage = "Error al cargar usuarios: ${e.localizedMessage}"
-        } finally {
-            isLoading = false
-        }
+@Composable
+fun ScreenCRUD(userList: List<User>, viewModel: UserViewModel) {
+
+    var _id by remember { mutableStateOf("") }
+    var nombre by remember { mutableStateOf("") }
+    var apellido by remember { mutableStateOf("") }
+    var pais by remember { mutableStateOf("") }
+    var identificacion by remember { mutableStateOf("") }
+    var contrasena by remember { mutableStateOf("") }
+    var correo by remember { mutableStateOf("") }
+    var telefono by remember { mutableStateOf("") }
+    var role by remember { mutableStateOf("") }
+    var isEditing by remember { mutableStateOf(false) }
+    var textButton by remember { mutableStateOf("Crear Usuario") }
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .fillMaxHeight()
+            .padding(12.dp),
+        verticalArrangement = Arrangement.Top,
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
     }
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text("Lista de Usuarios") },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primary,
-                    titleContentColor = MaterialTheme.colorScheme.onPrimary
-                )
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .fillMaxHeight()
+            .statusBarsPadding()
+            .padding(
+                top = 0.dp,
+                start = 15.dp,
+                end = 15.dp,
+                bottom = 0.dp
             )
-        }
-    ) { innerPadding ->
-        Column(
+    ) {
+        Formulario(
+            _id = _id,
+            nombre = nombre,
+            funNombre = { nombre = it },
+            apellido = apellido,
+            funApellido = { apellido = it },
+            pais = pais,
+            funPais = { pais = it },
+            identificacion = identificacion,
+            funIdentificacion = { identificacion = it },
+            contrasena = contrasena,
+            funContrasena = { contrasena = it },
+            correo = correo,
+            funCorreo = { correo = it },
+            telefono = telefono,
+            funTelefono = { telefono = it },
+            role = role,
+            funRole = { role = it },
+            isEditing = isEditing,
+            funIsEditing = { isEditing = false },
+            textButton = textButton,
+            funTextButton = { textButton = it },
+            funResetCampos = {
+                nombre = ""
+                apellido = ""
+                pais = ""
+                identificacion = ""
+                contrasena = ""
+                correo = ""
+                telefono = ""
+                role = ""
+            },
+            viewModel = viewModel
+        )
+        Column (
             modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding)
-                .padding(horizontal = 8.dp)
+                .fillMaxWidth()
         ) {
-            when {
-                isLoading -> {
-                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        CircularProgressIndicator()
-                    }
-                }
-                errorMessage != null -> {
-                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        Text("Error: $errorMessage", color = MaterialTheme.colorScheme.error)
-                    }
-                }
-                usuarios.isEmpty() && !isLoading -> {
-                    Box(modifier = Modifier
-                        .fillMaxSize()
-                        .padding(16.dp), contentAlignment = Alignment.Center) {
-                        Text("No hay usuarios para mostrar.")
-                    }
-                }
-                else -> {
-                    LazyColumn(modifier = Modifier.fillMaxSize()) {
-                        item {
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .background(
-                                        MaterialTheme.colorScheme.secondaryContainer.copy(
-                                            alpha = 0.3f
-                                        )
-                                    )
-                                    .padding(horizontal = 8.dp, vertical = 12.dp),
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Text("Nombre", modifier = Modifier.weight(2f), fontWeight = FontWeight.Bold)
-                                Spacer(modifier = Modifier.width(8.dp))
-                                Text("Email", modifier = Modifier.weight(2.5f), fontWeight = FontWeight.Bold)
-                                Spacer(modifier = Modifier.width(8.dp))
-                            }
-                            Divider(color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f))
+            LazyColumn(
+                contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)
+            ) {
+                items(userList) { user ->
+                    CardUser(
+                        user = user,
+                        fun_id = { _id = it },
+                        funNombre = { nombre = it },
+                        funApellido = { apellido = it },
+                        funPais = { pais = it },
+                        funIdentificacion = { identificacion = it },
+                        funContrasena = { contrasena = it },
+                        funCorreo = { correo = it },
+                        funTelefono = { telefono = it },
+                        funRole = { role = it },
+                        funTextButton = { textButton = it },
+                        funIsEditing = { isEditing = it },
+                        funDeleteUser = {
+                            viewModel.deleteUser(user._id!!)
                         }
-
-                        items(
-                            items = usuarios,
-                            key = { user -> user._id ?: user.hashCode() }
-                        ) { user ->
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(horizontal = 8.dp, vertical = 12.dp),
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Text(
-                                    text = "${user.nombre ?: ""} ${user.apellido ?: ""}".trim(),
-                                    modifier = Modifier.weight(2f)
-                                )
-                                Spacer(modifier = Modifier.width(8.dp))
-                                Text(
-                                    text = user.correo ?: "N/A",
-                                    modifier = Modifier.weight(2.5f)
-                                )
-                                Spacer(modifier = Modifier.width(8.dp))
-                            }
-                            Divider(color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f))
-                        }
-                    }
+                    )
                 }
             }
         }
     }
 }
+

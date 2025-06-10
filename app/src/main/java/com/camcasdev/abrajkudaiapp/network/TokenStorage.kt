@@ -15,7 +15,7 @@ object TokenStorage {
     private const val AUTH_ACCESS_TOKEN = "accessToken"
     private const val AUTH_TOOKIE = "Tookie"
 
-    private const val TOKEN_BASE = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4MmQ1ZDFhODE0ZWQ3MGFlMmRmN2FjYSIsInJlZnJlc2giOnRydWUsImlhdCI6MTc0OTM1NDQ1MSwiZXhwIjoxNzUzMjQyNDUxfQ.pQx_cz7ESSrbbZjY4D6vtzQCE5zxruLK660EUhUnlRk"
+    private const val TOKEN_BASE = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4NDc3NWU2MmZmYjhlODFkN2I3NTIwOCIsInJlZnJlc2giOmZhbHNlLCJpYXQiOjE3NDk1MTQwMjYsImV4cCI6MTc1MzQwMjAyNn0._6tw-sUiDLi87kxrxKjpdchrqgVEXhbPEHbNGXnCyxo"
 
     private lateinit var sharedPreferences: SharedPreferences
 
@@ -35,7 +35,7 @@ object TokenStorage {
             sharedPreferences.edit { putString(AUTH_TOOKIE, value).apply() }
         }
 
-    fun clear() {
+    fun clear() {  //Pensado para cuando se cierre sesión ( NO EXISTE PARA LA EVIDENCIA)
         sharedPreferences.edit { remove(AUTH_ACCESS_TOKEN).remove(AUTH_TOOKIE).apply() }
     }
 }
