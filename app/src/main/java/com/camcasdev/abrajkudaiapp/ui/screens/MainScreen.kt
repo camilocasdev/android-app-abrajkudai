@@ -23,6 +23,12 @@ import com.camcasdev.abrajkudaiapp.components.Formulario
 import com.camcasdev.abrajkudaiapp.models.User
 import com.camcasdev.abrajkudaiapp.viewmodels.UserViewModel
 import com.camcasdev.abrajkudaiapp.components.CardUser
+import android.util.Log
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.size
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Text
 
 @Composable
 fun MainScreen(viewModel: UserViewModel) {
@@ -30,7 +36,11 @@ fun MainScreen(viewModel: UserViewModel) {
     Box(
         modifier = Modifier.fillMaxSize()
     ) {
-        viewModel.getUserList()
+        try {
+            viewModel.getUserList()
+        } catch (e: Exception) {
+            Log.e("MainScreen", "Error al obtener la lista de usuarios", e)
+        }
         ScreenCRUD(viewModel._userList, viewModel)
     }
 }
@@ -49,6 +59,7 @@ fun ScreenCRUD(userList: List<User>, viewModel: UserViewModel) {
     var role by remember { mutableStateOf("") }
     var isEditing by remember { mutableStateOf(false) }
     var textButton by remember { mutableStateOf("Crear Usuario") }
+    var isLoading by remember { mutableStateOf(false) }
 
     Column(
         modifier = Modifier
@@ -110,30 +121,55 @@ fun ScreenCRUD(userList: List<User>, viewModel: UserViewModel) {
             modifier = Modifier
                 .fillMaxWidth()
         ) {
-            LazyColumn(
-                contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)
-            ) {
-                items(userList) { user ->
-                    CardUser(
-                        user = user,
-                        fun_id = { _id = it },
-                        funNombre = { nombre = it },
-                        funApellido = { apellido = it },
-                        funPais = { pais = it },
-                        funIdentificacion = { identificacion = it },
-                        funContrasena = { contrasena = it },
-                        funCorreo = { correo = it },
-                        funTelefono = { telefono = it },
-                        funRole = { role = it },
-                        funTextButton = { textButton = it },
-                        funIsEditing = { isEditing = it },
-                        funDeleteUser = {
-                            viewModel.deleteUser(user._id!!)
+            if (isLoading) {
+                LoadingModal("Cargando...")
+            } else {
+                if (userList.isNotEmpty()) {
+                    LazyColumn(
+                        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)
+                    ) {
+                        items(userList) { user ->
+                            CardUser(
+                                user = user,
+                                fun_id = { _id = it },
+                                funNombre = { nombre = it },
+                                funApellido = { apellido = it },
+                                funPais = { pais = it },
+                                funIdentificacion = { identificacion = it },
+                                funContrasena = { contrasena = it },
+                                funCorreo = { correo = it },
+                                funTelefono = { telefono = it },
+                                funRole = { role = it },
+                                funTextButton = { textButton = it },
+                                funIsEditing = { isEditing = it },
+                                funDeleteUser = {
+                                    viewModel.deleteUser(user._id!!)
+                                }
+                            )
                         }
-                    )
+                    }
+                } else {
+                    LoadingModal("Esperando la conexión...")
                 }
             }
         }
     }
 }
 
+@Composable
+fun LoadingModal(msg: String) {
+    Box(
+        contentAlignment = Alignment.Center,
+        modifier = Modifier
+            .fillMaxSize()
+            .size(70.dp)
+    ) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            CircularProgressIndicator()
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(text = msg)
+        }
+    }
+}

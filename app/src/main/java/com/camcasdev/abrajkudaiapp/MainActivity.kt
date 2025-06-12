@@ -45,20 +45,6 @@ class MainActivity : ComponentActivity() {
             Log.d("MainActivity", "TokenStorage inicializado.")
         }
 
-        val serviceInstane = RetrofitClient.apiService //Iniciamos la instancia para petición
-
-        lifecycleScope.launch {
-            try {
-                Log.d("Corutina", "Iniciando las peticiones")
-                val responseData: Response<List<User>> = serviceInstane.getUserList()
-
-                Log.d("Lista de Usuarios", "Respuesta de API: $responseData")
-
-            } catch (e: Exception) {
-                Log.e("MainActivity", "Error en la petición API", e)
-            }
-        }
-
         setContent {
             AbrajkudaiappTheme {
                 Surface(

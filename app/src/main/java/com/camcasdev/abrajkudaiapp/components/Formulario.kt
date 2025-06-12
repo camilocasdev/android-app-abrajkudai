@@ -1,5 +1,6 @@
 package com.camcasdev.abrajkudaiapp.components
 
+import android.util.Log
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -122,36 +123,48 @@ fun Formulario(
     Button(
         modifier = Modifier.fillMaxWidth(),
         onClick = {
+            var esFormularioValido = true
+            var telefonoLong: Long?
+
+            if (nombre.isBlank()) {
+                esFormularioValido = false
+            }
+
+            if (telefono.isBlank()) {
+                telefonoLong = null
+            } else {
+                try {
+                    telefonoLong = telefono.toLong()
+                } catch (e: NumberFormatException) {
+                    telefonoLong = null
+                    esFormularioValido = false
+                    Log.e("Formulario", "Error al convertir teléfono: '$telefono'", e)
+                }
+            }
+
+            if (!esFormularioValido) {
+                Log.d("Formulario", "Validación fallida. No se llamará al ViewModel.")
+                return@Button
+            }
+
+            val usuario = User(
+                _id = if (isEditing) _id else null,
+                nombre = nombre,
+                apellido = apellido,
+                pais = pais,
+                identificacion = identificacion,
+                contrasena = if (contrasena.isNotBlank()) contrasena else null,
+                correo = correo,
+                telefono = telefonoLong,
+                role = if (role.isNotBlank()) listOf(role) else emptyList()
+            )
+
             if (isEditing) {
-                viewModel.updateUser(
-                    User(
-                        _id = _id,
-                        nombre = nombre,
-                        apellido = apellido,
-                        pais = pais,
-                        identificacion = identificacion,
-                        contrasena = contrasena,
-                        correo = correo,
-                        telefono = telefono.toLong(),
-                        role = listOf(role)
-                    )
-                )
+                viewModel.updateUser(usuario)
                 funTextButton("Agregar Usuario")
                 funIsEditing()
             } else {
-                viewModel.createUser(
-                    User(
-                        _id = _id,
-                        nombre = nombre,
-                        apellido = apellido,
-                        pais = pais,
-                        identificacion = identificacion,
-                        contrasena = contrasena,
-                        correo = correo,
-                        telefono = telefono.toLong(),
-                        role = listOf(role)
-                    )
-                )
+                viewModel.createUser(usuario)
             }
             funResetCampos()
         }
